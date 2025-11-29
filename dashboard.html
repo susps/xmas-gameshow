@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" href="/output.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+
+  <title>Lobby Hub</title>
+</head>
+
+<body>
+  <div id="error-banner" class="error-banner" style="display: none;"></div>
+
+  <div class="lobby-container">
+      
+      <div class="user-section">
+          <img src="" id="avatar" class="avatar-image"/>
+          <div id="name" class="username"></div>
+      </div>
+
+      <!-- Section 1: Create Game Button (HOST Option) -->
+      <div id="create-section" class="lobby-action-section mb-8">
+          <a href="/host.html" class="host-button enter-button">
+            <i class="fa-solid fa-crown"></i>
+            <span>Create New Game (Host)</span>
+          </a>
+      </div>
+
+      <hr class="separator"/>
+
+      <!-- Section 2: Join Game (PLAYER Option) -->
+      <div id="join-section" class="lobby-action-section">
+          <h3 class="action-header">Or Join an Existing Game</h3>
+          <input 
+              type="text" 
+              id="lobby-code-input" 
+              placeholder="Enter Lobby Code (e.g., ABCD)"
+              maxlength="4"
+              autocomplete="off"
+          />
+          <button id="enter-lobby-button" class="join-button enter-button">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Join Lobby</span>
+          </button>
+      </div>
+
+      <!-- Section 3: Lobby Waiting Area (Hidden until joined) -->
+      <div id="lobby-section" style="display: none;" class="lobby-action-section">
+          <h2 class="lobby-header">Lobby Code: <span id="display-lobby-code" class="code-display"></span></h2>
+          
+          <div id="player-list" class="player-list">
+          </div>
+
+          <button id="ready-button" class="ready-button enter-button" disabled>
+            <i class="fa-solid fa-person-running"></i>
+            <span>READY</span>
+          </button>
+          
+          <p class="disconnect-info">
+             <i class="fa-solid fa-circle-exclamation"></i>
+             Wait here until the host starts the game. Do not refresh!
+          </p>
+      </div>
+  </div>
+
+  <script src="/auth.js" defer></script>
+  <script src="/snow.js" defer></script>
+</body>
+</html>
