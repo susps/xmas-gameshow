@@ -5,6 +5,7 @@ const joinSection = document.getElementById('join-section');
 const lobbySection = document.getElementById('lobby-section');
 const lobbyCodeInput = document.getElementById('lobby-code-input');
 const enterLobbyButton = document.getElementById('enter-lobby-button');
+const hostLobbyButton = document.getElementById('host-lobby-button'); // NEW
 const displayLobbyCode = document.getElementById('display-lobby-code');
 const playerList = document.getElementById('player-list');
 const readyButton = document.getElementById('ready-button');
@@ -66,12 +67,14 @@ function setupLobbyListeners() {
     socket.on('connect', () => {
         console.log('Connected to server with socket ID:', socket.id);
         enterLobbyButton.disabled = false;
+        hostLobbyButton.disabled = false; // Enable Host button
         readyButton.disabled = false;
     });
 
     socket.on('disconnect', () => {
         console.log('Disconnected from server.');
         enterLobbyButton.disabled = true;
+        hostLobbyButton.disabled = true; // Disable Host button
         readyButton.disabled = true;
     });
     
@@ -79,15 +82,28 @@ function setupLobbyListeners() {
     socket.on('connect_error', (err) => {
         console.error('Socket.IO Connection Error:', err.message);
         // Display a user-friendly error message
+        // Using a simple alert for quick feedback, but a custom modal is better practice
         alert('Failed to connect to the game server. Please try refreshing the page.');
     });
 
     // 2. Event Listeners for UI Actions
+
+    // NEW: Host Lobby button listener
+    hostLobbyButton.addEventListener('click', () => {
+        hostLobbyButton.disabled = true;
+        enterLobbyButton.disabled = true;
+
+        // Emit host request to server
+        socket.emit('host_game', { discordUser: discordUser });
+    });
+
+    // Join Lobby button listener
     enterLobbyButton.addEventListener('click', () => {
         const code = lobbyCodeInput.value.toUpperCase();
         if (code.length === 4) {
-            // Disable button to prevent double-click while waiting for server response
+            // Disable buttons to prevent double-click while waiting for server response
             enterLobbyButton.disabled = true; 
+            hostLobbyButton.disabled = true;
             
             // Send join request to server
             socket.emit('join_game', {
@@ -95,6 +111,7 @@ function setupLobbyListeners() {
                 discordUser: discordUser
             });
         } else {
+            // Using a simple alert for quick feedback
             alert('Please enter a 4-character lobby code.');
         }
     });
@@ -123,12 +140,22 @@ function setupLobbyListeners() {
         // Switch to lobby view and render list
         enterLobbyView(lobbyCode);
 
-        // Re-enable the join button in case the user was just joining (and clicks again or rejoins)
+        // Re-enable the join/host buttons in case the user was just joining/hosting
         enterLobbyButton.disabled = false;
+        hostLobbyButton.disabled = false;
         
         // Update the display code and player list
         displayLobbyCode.innerText = lobbyCode;
         renderPlayerList(players);
+    });
+
+    // Handle errors from the server when trying to join/host
+    socket.on('lobby_error', (message) => {
+        alert(message); // Show error message to user
+        
+        // Re-enable buttons if an error occurs
+        enterLobbyButton.disabled = false;
+        hostLobbyButton.disabled = false;
     });
 }
 
