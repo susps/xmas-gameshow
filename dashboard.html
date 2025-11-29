@@ -20,18 +20,30 @@
           <div id="name" class="username"></div>
       </div>
 
+      <!-- Updated join-section to include Host option -->
       <div id="join-section" class="lobby-action-section">
-          <input 
-              type="text" 
-              id="lobby-code-input" 
-              placeholder="Enter Lobby Code (e.g., ABCD)"
-              maxlength="4"
-              autocomplete="off"
-          />
-          <button id="enter-lobby-button" class="enter-button">
-            <i class="fa-solid fa-right-to-bracket"></i>
-            <span>Enter Lobby</span>
+          <!-- Host Lobby Button -->
+          <button id="host-lobby-button" class="enter-button host-button">
+            <i class="fa-solid fa-house-chimney-user"></i>
+            <span>Host New Lobby</span>
           </button>
+
+          <div class="divider">OR</div>
+
+          <!-- Join Lobby Input/Button -->
+          <div class="join-group">
+              <input 
+                  type="text" 
+                  id="lobby-code-input" 
+                  placeholder="Enter Lobby Code (e.g., ABCD)"
+                  maxlength="4"
+                  autocomplete="off"
+              />
+              <button id="enter-lobby-button" class="enter-button join-button" disabled>
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Join Lobby</span>
+              </button>
+          </div>
       </div>
 
       <div id="lobby-section" style="display: none;" class="lobby-action-section">
