@@ -294,46 +294,36 @@ body {
     box-shadow: 0 0 8px var(--color-ready);
 }
 
-/* Themed snowflakes */
-.snowflake {
-  color: var(--color-text-main); /* White color */
-  position: fixed; /* Keep them relative to the viewport */
-  top: -100px;
-  pointer-events: none; /* Allows clicking through snowflakes */
-  user-select: none; /* Prevents text selection */
-  opacity: 0.8;
-  z-index: 10; /* Ensure they appear over the background but under the UI */
+/* ----------------------------------------------------------------
+   5. Snowfall Animations
+---------------------------------------------------------------- */
 
-  /* Apply the animations */
-  animation: 
-    fall linear infinite, 
-    sway ease-in-out infinite; 
-  
-  /* Sway duration can be customized for variety */
-  animation-duration: 5s; /* Fall duration set by snow.js */
-  animation-iteration-count: infinite, infinite;
-  animation-timing-function: linear, ease-in-out;
-}
-
-/* 1. Define the vertical movement (fall) */
+/* Vertical Movement */
 @keyframes fall {
-  0% {
-    transform: translateY(-100vh);
-  }
-  100% {
-    transform: translateY(100vh);
-  }
+    from { top: -10vh; }
+    to { top: 110vh; }
 }
 
-/* 2. Define the subtle side-to-side drift */
-@keyframes sway {
-  0% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(50px);
-  }
-  100% {
-    transform: translateX(0);
-  }
+/* Side-to-side Drift */
+@keyframes drift {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(40px); }
+  100% { transform: translateX(0); }
+}
+
+/* Snowflake base styling */
+.snowflake {
+    position: fixed;
+    top: -10vh;
+    color: var(--color-text-light);
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.5); /* Subtle glow */
+    pointer-events: none;
+    user-select: none;
+    z-index: 10;
+    opacity: 0.8;
+    will-change: top, transform;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    /* NOTE: The existing snow.js sets the animation duration property dynamically. */
+    animation-name: fall; /* JS will complete the animation declaration */
 }
