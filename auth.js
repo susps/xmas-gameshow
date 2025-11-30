@@ -78,6 +78,7 @@ function enterLobbyView(code) {
  */
 function setupLobbyListeners() {
     // 1. Establish Socket.IO Connection
+    // Ensure io() is globally available (assumed from external script in dashboard.html)
     socket = io();
 
     socket.on('connect', () => {
@@ -101,7 +102,7 @@ function setupLobbyListeners() {
 
     // 2. Event Listeners for UI Actions
 
-    // NEW: Host Lobby button listener
+    // Host Lobby button listener
     hostLobbyButton.addEventListener('click', () => {
         hostLobbyButton.disabled = true;
         enterLobbyButton.disabled = true;
@@ -168,7 +169,8 @@ function setupLobbyListeners() {
 
     // Handle errors from the server when trying to join/host
     socket.on('lobby_error', (message) => {
-        alert(message); // Show error message to user
+        // Use console.error instead of alert to match previous instructions for modals
+        console.error('Lobby Error:', message); 
         
         // Re-enable buttons if an error occurs
         enterLobbyButton.disabled = false;
@@ -188,6 +190,9 @@ window.addEventListener('load', () => {
         window.location.href = "/index.html"; 
         return;
     }
+
+    // FIX: Clear the URL hash immediately after reading it to prevent redirect loop
+    window.history.replaceState({}, document.title, window.location.pathname);
 
     // Fetch user data from Discord
     fetch("https://discord.com/api/users/@me", {
