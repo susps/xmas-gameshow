@@ -12,7 +12,20 @@
 </head>
 
 <body>
-  <!-- Snow effect container -->
+  <!-- Settings Button -->
+  <button id="settings-toggle-btn" class="settings-button">
+    <i class="fas fa-cog"></i>
+  </button>
+
+  <!-- Settings Panel -->
+  <div id="settings-panel" class="settings-panel">
+    <h3>Theme Settings</h3>
+    <div class="theme-selector">
+        <button id="theme-warm-btn">Warm Theme</button>
+        <button id="theme-cold-btn">Cold Theme</button>
+    </div>
+  </div>
+    
   <div class="lobby-container">
       
       <div class="user-section">
@@ -20,30 +33,22 @@
           <div id="name" class="username"></div>
       </div>
 
-      <!-- Updated join-section to include Host option -->
       <div id="join-section" class="lobby-action-section">
-          <!-- Host Lobby Button -->
-          <button id="host-lobby-button" class="enter-button host-button">
-            <i class="fa-solid fa-house-chimney-user"></i>
-            <span>Host New Lobby</span>
+          <input 
+              type="text" 
+              id="lobby-code-input" 
+              placeholder="Enter Lobby Code (e.g., ABCD)"
+              maxlength="4"
+              autocomplete="off"
+          />
+          <button id="enter-lobby-button" class="enter-button" disabled>
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Enter Lobby</span>
           </button>
-
-          <div class="divider">OR</div>
-
-          <!-- Join Lobby Input/Button -->
-          <div class="join-group">
-              <input 
-                  type="text" 
-                  id="lobby-code-input" 
-                  placeholder="Enter Lobby Code (e.g., ABCD)"
-                  maxlength="4"
-                  autocomplete="off"
-              />
-              <button id="enter-lobby-button" class="enter-button join-button" disabled>
-                <i class="fa-solid fa-right-to-bracket"></i>
-                <span>Join Lobby</span>
-              </button>
-          </div>
+          <button id="host-lobby-button" class="host-button" disabled>
+            <i class="fa-solid fa-house-user"></i>
+            <span>Host Lobby</span>
+          </button>
       </div>
 
       <div id="lobby-section" style="display: none;" class="lobby-action-section">
@@ -51,9 +56,8 @@
           
           <div id="player-list" class="player-list">
               <!-- Player cards will be rendered here by auth.js -->
-          </div>
+              </div>
 
-          <!-- Use dataset.ready to track state in auth.js -->
           <button id="ready-button" class="ready-button enter-button" data-ready="false" disabled>
             <i class="fa-solid fa-play"></i>
             <span>READY</span>
@@ -61,10 +65,8 @@
       </div>
   </div>
 
-  <!-- Fix 1: Include the Socket.IO client library script -->
-  <script src="/socket.io/socket.io.js"></script> 
-  
-  <script src="/snow.js" defer></script>
   <script src="/auth.js" defer></script>
+  <script src="/snow.js" defer></script>
+  <script src="/theme.js" defer></script>
 </body>
 </html>

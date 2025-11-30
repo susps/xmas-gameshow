@@ -1,302 +1,339 @@
-/* ----------------------------------------------------------------
-   1. CSS Variables and Global Reset
----------------------------------------------------------------- */
-:root {
-    /* Colors */
-    --color-bg-dark: #0f0f13; /* Very dark background */
-    --color-surface-dark: #1f1f25; /* Card/Container background */
-    --color-surface-card: #2c2c36; /* Player Card background */
-    --color-text-light: #f0f0f5;
-    --color-discord-blue: #7289da;
-    --color-discord-blue-hover: #5865f2;
-    --color-festive-red: #e63946; /* Primary festive action color */
-    --color-festive-red-hover: #f15b69;
-    --color-status-ready: #50fa7b; /* Vibrant green */
-    --color-status-waiting: #ffcc66; /* Gold/yellow */
-
-    /* Spacing & Radius */
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --transition-speed: 0.25s;
-
-    /* Shadows */
-    --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
 /* Reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* ----------------------------------------------------------------
-   2. Base Layout and Typography
----------------------------------------------------------------- */
+/* --- Theme Variables --- */
+:root {
+  /* WARM Theme (Default) */
+  --bg-dark: #510021;         /* Primary Background */
+  --bg-card: #81001d;         /* Card/Secondary Background */
+  --color-primary: #e00016;   /* Main Action Color (Buttons, Highlights) */
+  --color-hover: #ea3521;     /* Button Hover/Active */
+  --color-ready: #ffa038;     /* Ready Status / Lightest Accent */
+  --color-text-main: #d6e1ed; /* General Text Color */
+  --color-text-secondary: #f56b2d; /* Secondary Text/Outline */
+  --color-border: #b0001a;    /* Border/Input Outline */
+}
+
+.theme-cold {
+  /* COLD Theme Override */
+  --bg-dark: #6500ab;
+  --bg-card: #6f37b5;
+  --color-primary: #796ebe;
+  --color-hover: #83a5c8;
+  --color-ready: #ffffff;
+  --color-text-main: #ffffff;
+  --color-text-secondary: #acc3da;
+  --color-border: #d6e1ed;
+}
+
+/* --- Base & Layout --- */
 body {
-    height: 100vh;
-    background: var(--color-bg-dark);
-    color: var(--color-text-light);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
+  height: 100vh;
+  background: var(--bg-dark); /* Using variable */
+  color: var(--color-text-main); /* Using variable */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.5s ease;
 }
 
 /* Center containers */
 .login-container,
 .lobby-container {
-    text-align: center;
-    z-index: 20;
-    width: 90%;
-    max-width: 600px;
-    background-color: var(--color-surface-dark);
-    padding: 2.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-deep);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+  z-index: 3;
+  width: 90%;
+  max-width: 600px;
 }
 
-/* Snow container sits above the page background but below UI elements */
-#snow-container {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 10;
-}
-
-/* ----------------------------------------------------------------
-   3. Button Styles (Login & Enter/Ready)
----------------------------------------------------------------- */
-
-/* --- Base Button Styling --- */
+/* --- General Button Styling --- */
 .login-button,
-.enter-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    cursor: pointer;
-    font-size: 1.5rem;
-    font-weight: 700;
-    padding: 1rem 3rem;
-    border-radius: var(--radius-lg);
-    border: none;
-    text-decoration: none;
-    color: white;
-    transition: all var(--transition-speed) ease-in-out;
+.enter-button,
+.host-button,
+.settings-button {
+  color: var(--color-text-main);
+  text-decoration: none;
+  font-size: 1.5rem;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  border: 2px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: background-color .2s, transform .2s, box-shadow .2s, border-color .2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  cursor: pointer;
 }
 
-/* --- Discord Login Button --- */
+/* Discord Login button specific styling */
 .login-button {
-    background-color: var(--color-discord-blue);
-    border: 2px solid var(--color-discord-blue-hover);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  background-color: #7289da; /* Discord Blue (constant) */
+  border-color: #5865f2; /* Darker Discord Blue (constant) */
 }
 
 .login-button:hover {
-    background-color: var(--color-discord-blue-hover);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(88, 101, 242, 0.6);
+  background-color: #5865f2; /* Darker Discord Blue (constant) */
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 
-/* --- Enter/Ready Button (Festive Red) --- */
-.enter-button {
-    background-color: var(--color-festive-red);
-    box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
-    margin-top: 1rem;
+/* Enter Lobby, Host, Ready buttons (Themed) */
+.enter-button, .host-button {
+  background-color: var(--color-primary); /* Themed */
+  border-color: var(--color-border);
 }
 
-.enter-button:hover:not(:disabled) {
-    background-color: var(--color-festive-red-hover);
-    transform: translateY(-4px);
-    /* Adding a festive glow */
-    box-shadow: 0 8px 25px rgba(230, 57, 70, 0.8), 0 0 15px var(--color-festive-red);
+.enter-button:hover, .host-button:hover, .ready-button[data-ready="false"]:hover {
+  background-color: var(--color-hover); /* Themed */
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 
-/* Disabled State */
-.enter-button:disabled {
-    background-color: #555566;
-    color: #bbbbcc;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-    opacity: 0.7;
+.ready-button[data-ready="true"] {
+    background-color: var(--bg-card);
+    border-color: var(--color-ready);
 }
 
-
-/* ----------------------------------------------------------------
-   4. Lobby and User Section Styles
----------------------------------------------------------------- */
-
-/* User Info Section */
+/* --- User Info and Lobby --- */
 .user-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
 .avatar-image {
-    width: 6rem;
-    height: 6rem;
-    border-radius: 50%;
-    margin-bottom: 1rem;
-    border: 4px solid var(--color-discord-blue);
-    box-shadow: 0 0 15px rgba(114, 137, 218, 0.5); /* Avatar glow */
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  border: 4px solid var(--color-ready); /* Themed border */
 }
 
 .username {
-    font-size: 2.2rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    color: var(--color-text-light);
+  font-size: 2rem;
+  font-weight: 600;
 }
 
-.lobby-action-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.lobby-header {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    color: var(--color-festive-red);
-    font-weight: 700;
-    text-shadow: 0 0 5px rgba(230, 57, 70, 0.5); /* Text glow */
-}
-
-/* Input Field Styling */
+/* Lobby input */
 #lobby-code-input {
+    background: var(--bg-card);
+    color: var(--color-text-main);
+    border: 2px solid var(--color-border);
     padding: 1rem;
-    font-size: 1.5rem;
-    border-radius: var(--radius-md);
-    border: 2px solid var(--color-discord-blue);
-    background-color: #111116;
-    color: var(--color-status-waiting); /* Gold text for value */
+    font-size: 1.25rem;
     text-align: center;
+    border-radius: 8px;
+    margin-bottom: 1rem;
     width: 100%;
     max-width: 300px;
-    margin-bottom: 1.5rem;
-    text-transform: uppercase;
-    font-weight: 700;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-#lobby-code-input::placeholder {
-    color: #888;
+#lobby-code-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary);
 }
 
-/* Player List Container */
+/* Lobby Display */
+.lobby-header {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#display-lobby-code {
+    font-weight: bold;
+    color: var(--color-ready);
+    letter-spacing: 0.1em;
+    font-size: 2rem;
+}
+
 .player-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
-    margin: 1.5rem 0 2rem;
-    max-height: 350px;
-    overflow-y: auto;
-    padding: 15px 5px;
-    width: 100%;
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-surface-dark);
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Individual Player Card */
 .player-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    background-color: var(--color-surface-card);
-    border-radius: var(--radius-md);
-    width: 100px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    transition: transform var(--transition-speed);
+    background: var(--bg-dark);
+    padding: 1rem;
+    border-radius: 8px;
+    width: 150px;
+    text-align: center;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.player-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-}
-
-.player-avatar {
-    width: 50px;
-    height: 50px;
+.player-card .player-avatar {
+    width: 3rem;
+    height: 3rem;
     border-radius: 50%;
-    margin-bottom: 6px;
-    border: 2px solid var(--color-discord-blue);
+    margin-bottom: 0.5rem;
+    border: 2px solid var(--color-primary);
 }
 
 .player-name {
-    font-size: 0.85rem;
     font-weight: 600;
+    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
-    color: var(--color-text-light);
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
+}
+
+.player-name.current-user {
+    color: var(--color-ready);
 }
 
 .player-status {
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 3px 6px;
-    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
 }
 
 .player-status.ready {
-    color: var(--color-status-ready);
-    background-color: rgba(80, 250, 123, 0.15);
+    background: var(--color-ready);
+    color: var(--bg-dark); /* Dark text on light accent */
 }
 
 .player-status.waiting {
-    color: var(--color-status-waiting);
-    background-color: rgba(255, 204, 102, 0.15);
+    background: var(--color-border);
+    color: var(--color-text-main);
 }
 
-
-/* ----------------------------------------------------------------
-   5. Snowfall Animations
----------------------------------------------------------------- */
-
-/* Vertical Movement */
-@keyframes fall {
-    from { top: -10vh; }
-    to { top: 110vh; }
-}
-
-/* Side-to-side Drift */
-@keyframes drift {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(40px); }
-  100% { transform: translateX(0); }
-}
-
-/* Snowflake base styling */
-.snowflake {
+/* --- Theme Settings Modal --- */
+.settings-panel {
     position: fixed;
-    top: -10vh;
-    color: var(--color-text-light);
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.5); /* Subtle glow */
-    pointer-events: none;
-    user-select: none;
-    z-index: 10;
-    opacity: 0.8;
-    will-change: top, transform;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    /* NOTE: The existing snow.js sets the animation duration property dynamically. */
-    animation-name: fall; /* JS will complete the animation declaration */
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100%;
+    background: var(--bg-card);
+    border-left: 2px solid var(--color-border);
+    box-shadow: -4px 0 10px rgba(0,0,0,0.5);
+    z-index: 20;
+    padding: 20px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.settings-panel.open {
+    transform: translateX(0);
+}
+
+.settings-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    background-color: var(--color-primary);
+    border-color: var(--color-border);
+    z-index: 21;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-button i {
+    color: var(--color-text-main);
+}
+
+.settings-button:hover {
+    transform: scale(1.05);
+    background-color: var(--color-hover);
+}
+
+.settings-panel h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-ready);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+}
+
+.theme-selector button {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.2s;
+    background-color: var(--color-primary);
+    color: var(--color-text-main);
+    border: 2px solid var(--color-border);
+    cursor: pointer;
+}
+
+.theme-selector button:hover {
+    background-color: var(--color-hover);
+}
+
+.theme-selector button.active {
+    border-color: var(--color-ready);
+    box-shadow: 0 0 8px var(--color-ready);
+}
+
+/* Themed snowflakes */
+.snowflake {
+  color: var(--color-text-main); /* White color */
+  position: fixed; /* Keep them relative to the viewport */
+  top: -100px;
+  pointer-events: none; /* Allows clicking through snowflakes */
+  user-select: none; /* Prevents text selection */
+  opacity: 0.8;
+  z-index: 10; /* Ensure they appear over the background but under the UI */
+
+  /* Apply the animations */
+  animation: 
+    fall linear infinite, 
+    sway ease-in-out infinite; 
+  
+  /* Sway duration can be customized for variety */
+  animation-duration: 5s; /* Fall duration set by snow.js */
+  animation-iteration-count: infinite, infinite;
+  animation-timing-function: linear, ease-in-out;
+}
+
+/* 1. Define the vertical movement (fall) */
+@keyframes fall {
+  0% {
+    transform: translateY(-100vh);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+/* 2. Define the subtle side-to-side drift */
+@keyframes sway {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(50px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
