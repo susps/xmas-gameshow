@@ -20,14 +20,14 @@
 
 .theme-cold {
   /* COLD Theme Override */
-  --bg-dark: #6500ab;
-  --bg-card: #6f37b5;
-  --color-primary: #796ebe;
-  --color-hover: #83a5c8;
-  --color-ready: #ffffff;
-  --color-text-main: #ffffff;
-  --color-text-secondary: #acc3da;
-  --color-border: #d6e1ed;
+  --bg-dark: #6500ab;         /* Primary Background (Darker Purple) */
+  --bg-card: #6f37b5;         /* Card/Secondary Background (Lighter Purple) */
+  --color-primary: #796ebe;   /* Main Action Color (Muted Blue/Purple) */
+  --color-hover: #83a5c8;     /* Button Hover/Active (Lighter Blue) */
+  --color-ready: #d6e1ed;     /* Ready Status / Lightest Accent (Very light blue) */
+  --color-text-main: #ffffff; /* General Text Color (White) */
+  --color-text-secondary: #acc3da; /* Secondary Text/Outline */
+  --color-border: #d6e1ed;    /* Border/Input Outline (Very light blue) */
 }
 
 /* --- Base & Layout --- */
@@ -52,10 +52,23 @@ body {
   max-width: 600px;
 }
 
+/* --- Logo Styling --- */
+.app-logo-image {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease-out;
+}
+.app-logo-image:hover {
+    transform: scale(1.02);
+}
+
 /* --- General Button Styling --- */
 .login-button,
 .enter-button,
 .host-button,
+.ready-button,
 .settings-button {
   color: var(--color-text-main);
   text-decoration: none;
@@ -95,6 +108,11 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 
+/* The Ready Button is special */
+.ready-button {
+    background-color: var(--color-primary);
+    border-color: var(--color-border);
+}
 .ready-button[data-ready="true"] {
     background-color: var(--bg-card);
     border-color: var(--color-ready);
@@ -294,37 +312,46 @@ body {
     box-shadow: 0 0 8px var(--color-ready);
 }
 
-/* ----------------------------------------------------------------
-   5. Snowfall Animations
----------------------------------------------------------------- */
-
-/* Vertical Movement */
-@keyframes fall {
-    from { top: -10vh; }
-    to { top: 110vh; }
-}
-
-/* Side-to-side Drift */
-@keyframes drift {
-  0% { transform: translateX(0); }
-  50% { transform: translateX(40px); }
-  100% { transform: translateX(0); }
-}
-
-/* Snowflake base styling */
+/* --- Snowfall Styles (Existing/Untouched) --- */
 .snowflake {
-    position: fixed;
-    top: -10vh;
-    color: var(--color-text-light);
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.5); /* Subtle glow */
-    pointer-events: none;
-    user-select: none;
-    z-index: 2;
-    opacity: 0.8;
-    will-change: top, transform;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    /* NOTE: The existing snow.js sets the animation duration property dynamically. */
-    animation-name: fall; /* JS will complete the animation declaration */
+  color: #fff; /* White color */
+  position: fixed; /* Keep them relative to the viewport */
+  top: 0;
+  pointer-events: none; /* Allows clicking through snowflakes */
+  user-select: none; /* Prevents text selection */
+  opacity: 0.8;
+  z-index: 10; /* Ensure they appear over the background but under the UI */
+
+  /* Apply the animations */
+  animation: 
+    fall linear infinite, /* Use the random duration from snow.js */
+    sway ease-in-out infinite; /* Apply the swaying motion */
+  
+  /* The duration for the 'fall' animation is set by snow.js: el.style.animationDuration */
+  animation-duration: 5s; /* Default sway duration */
+  animation-iteration-count: infinite, infinite;
+  animation-timing-function: linear, ease-in-out;
 }
 
+/* 1. Define the vertical movement (fall) */
+@keyframes fall {
+  0% {
+    transform: translateY(-100vh);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+/* 2. Define the subtle side-to-side drift */
+@keyframes sway {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(50px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
