@@ -113,7 +113,6 @@ function setupLobbyListeners() {
              if (currentStage !== 'LOBBY' && currentStage !== 'WAITING_FOR_READY') {
                  // Host will typically have a different view, but for now, they can stay on host page or be redirected
                  // For now, let the host stay on host.html to manually advance rounds (in a future step).
-                 // The "temporary alert" should be removed or replaced with host game control UI.
                  console.log(`Game started. Current stage: ${currentStage}`);
                  startGameButton.style.display = 'none'; // Hide start button once game is underway
              } else {
@@ -169,9 +168,22 @@ function setupLobbyListeners() {
 
     // 3. Event Listeners for UI Actions (Host Page)
     if (startGameButton) { // Only present on host.html
-         startGameButton.addEventListener('click', () => {
+          startGameButton.addEventListener('click', () => {
             startGameButton.disabled = true; // Prevent spamming
-            socket.emit('start_game');
+            
+            // Host sends custom game data (or null if none) upon starting the game
+            const GAME_DATA_STORAGE_KEY = 'christmasQuizGameData';
+            let customGameData = null;
+            try {
+                const storedData = localStorage.getItem(GAME_DATA_STORAGE_KEY);
+                if (storedData) {
+                    customGameData = JSON.parse(storedData);
+                }
+            } catch (e) {
+                console.error("Failed to parse custom game data from localStorage:", e);
+            }
+            
+            socket.emit('start_game', { customGameData: customGameData }); // Pass the data here
          });
     }
 
@@ -195,61 +207,18 @@ function setupLobbyListeners() {
         
         // If host error, redirect player back to dashboard
         if (window.IS_HOST_PAGE) {
-             window.location.href = "/dashboard.html"; 
+             // For a host error, better to send them back to the dashboard to try again
+             window.location.href = "/auth/discord"; 
         }
     });
     
-    // Receive updated lobby data
-    socket.on('lobby_update', (data) => {
-        const { lobbyCode, players, currentStage } = data;
-        
-        // --- Shared Logic ---
-        displayLobbyCode.innerText = lobbyCode;
-        renderPlayerList(players);
-
-        // --- Player Page (Dashboard) Logic ---
-        if (!window.IS_HOST_PAGE) {
-             enterLobbyView(lobbyCode);
-             const currentUser = players.find(p => p.discordId === discordUser.id);
-             if (currentUser) {
-                 // Update ready button state
-                 readyButton.dataset.ready = currentUser.isReady;
-                 readyButton.innerHTML = currentUser.isReady ? 
-                     '<i class="fa-solid fa-hourglass-half"></i><span>WAITING</span>' : 
-                     '<i class="fa-solid fa-play"></i><span>READY</span>';
-             }
-             
-             // If game starts, move to a game view (NEXT STEP: Create game_view.html)
-             if (currentStage !== 'LOBBY' && currentStage !== 'WAITING_FOR_READY') {
-                 // Temporary alert for game start
-                 alert(`Game starting in stage: ${currentStage}`);
-                 // window.location.href = "/game_view.html?code=" + lobbyCode;
-             }
-        } 
-        
-        // --- Host Page Logic ---
-        if (window.IS_HOST_PAGE) {
-             if (currentStage !== 'LOBBY' && currentStage !== 'WAITING_FOR_READY') {
-                 // Temporary alert for game start
-                 alert(`Game starting in stage: ${currentStage}`);
-                 // window.location.href = "/game_view.html?code=" + lobbyCode + "&host=true";
-             } else {
-                 startGameButton.disabled = players.filter(p => p.isReady).length < 2;
-             }
-        }
-    });
+    // Receive updated lobby data (The main listener is already at the top of setupLobbyListeners)
 
     // Handle new question (This is where the game UI would be driven)
     socket.on('new_question', (question) => {
         console.log("New Question Received:", question);
         // This is a placeholder for the actual game display logic
         alert(`New Question: ${question.text} (Time: ${question.timeLimitMs / 1000}s)`);
-
-        // For testing, let's auto-submit a wrong answer after a delay
-        // setTimeout(() => {
-        //     socket.emit('submit_answer', { answer: 'wrong answer' });
-        //     console.log('Auto-submitted answer: wrong answer');
-        // }, 2000); 
     });
 
     // Handle question results
@@ -262,27 +231,83 @@ function setupLobbyListeners() {
     socket.on('stage_update', (data) => {
         console.log('Game Stage Update:', data.stage);
     });
+
+    // 5. Initial Join Logic (Host/Player)
+    socket.on('connect', () => {
+        console.log('Connected to server with socket ID:', socket.id);
+        
+        if (window.IS_HOST_PAGE) {
+            // Host is creating a game, no code needed (server generates one)
+            // NOTE: Custom game data is now sent on start_game event
+            socket.emit('join_game', {
+                discordUser: discordUser,
+                isHostRequest: true
+            });
+            document.getElementById("name").innerText = `Host: ${discordUser.name}`;
+            if (startGameButton) startGameButton.disabled = false;
+        } else {
+           // Player is joining a lobby code from the URL (if available)
+           const params = new URLSearchParams(window.location.search);
+           const code = params.get('code');
+           
+           if (code) {
+               socket.emit('join_game', {
+                   code: code.toUpperCase(),
+                   discordUser: discordUser
+               });
+           } else {
+               // Enable action buttons if no code in URL (player on dashboard)
+               if (enterLobbyButton) enterLobbyButton.disabled = false;
+               if (hostLobbyButton) hostLobbyButton.disabled = false;
+           }
+        }
+    });
 }
 
 
-// --- INITIAL AUTHENTICATION AND SETUP ---
-// ... (rest of the window.addEventListener('load', ...) remains the same)
+// ------------------------------------------------------------------
+// --- INITIAL AUTHENTICATION AND SETUP (WITH TOKEN PERSISTENCE) ---
+// ------------------------------------------------------------------
 window.addEventListener('load', () => {
     const fragment = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = fragment.get("access_token");
+    
+    // 1. Check URL fragment for token (Discord redirect)
+    const urlAccessToken = fragment.get("access_token");
     const tokenType = fragment.get("token_type");
+    
+    // 2. Check localStorage for a previously saved token
+    const storedAccessToken = localStorage.getItem('discord_access_token');
+    const storedTokenType = localStorage.getItem('discord_token_type');
+    
+    let accessToken = urlAccessToken || storedAccessToken;
+    let finalTokenType = tokenType || storedTokenType;
 
+
+    if (urlAccessToken) {
+        // If we got the token from the URL, store it and clean the URL fragment
+        localStorage.setItem('discord_access_token', urlAccessToken);
+        localStorage.setItem('discord_token_type', tokenType);
+        
+        // **CRITICAL FIX**: Clean the URL fragment to prevent token loss on reload/navigation
+        window.history.replaceState(null, null, window.location.pathname);
+    }
+    
+    // Final check for token availability
     if (!accessToken) {
-        // Redirect to login if token is missing (not authenticated)
+        // Redirect to login if token is missing from both URL and localStorage
+        console.error("No access token found. Redirecting to login.");
         window.location.href = "/index.html"; 
         return;
     }
 
     // Fetch user data from Discord
     fetch("https://discord.com/api/users/@me", {
-        headers: { authorization: `${tokenType} ${accessToken}` },
+        headers: { authorization: `${finalTokenType} ${accessToken}` },
     })
-    .then(r => r.json())
+    .then(r => {
+        if (!r.ok) throw new Error('Discord API failed to fetch user data.');
+        return r.json();
+    })
     .then(user => {
         // Store user info
         discordUser = {
@@ -306,7 +331,10 @@ window.addEventListener('load', () => {
     })
     .catch(error => {
         console.error("Discord API fetch error:", error);
-        // In case of error, redirect to login page
+        // If API fetch fails (e.g., expired or invalid token), clear and redirect
+        localStorage.removeItem('discord_access_token');
+        localStorage.removeItem('discord_token_type');
+        alert("Authentication failed. Please log in again.");
         window.location.href = "/index.html"; 
     });
 });
