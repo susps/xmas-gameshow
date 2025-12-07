@@ -50,13 +50,15 @@ app.get('/auth/discord', (request, response) => {
 	return response.sendFile('dashboard.html', { root: '.' });
 });
 
-// New route for the Host page
 app.get('/host', (request, response) => {
     return response.sendFile('host.html', { root: '.' });
 });
 
+app.get('/editor', (request, response) => {
+    return response.sendFile('editor.html', { root: '.' });
+});
+
 app.get('/game', (request, response) => {
-    // Note: The client logic in game_view.js will handle the host view later if needed.
     return response.sendFile('game_view.html', { root: '.' });
 });
 

@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,37 +16,80 @@
   <div id="error-banner" class="error-banner" style="display: none;"></div>
 
   <div class="lobby-container">
-      
-      <div class="user-section">
-          <img src="" id="avatar" class="avatar-image"/>
-          <div id="name" class="username host-name">Host: </div>
+
+    <div class="user-section">
+      <img src="" id="avatar" class="avatar-image" />
+      <div id="name" class="username host-name">Host: </div>
+    </div>
+
+    <div id="lobby-wait-section" class="lobby-action-section">
+      <h2 class="host-header">Waiting for Players...</h2>
+
+      <p class="host-instructions">
+        Share this code with your players:
+        <span id="display-lobby-code" class="code-display large-code">ABCD</span>
+      </p>
+
+      <div id="player-list" class="player-list">
+        <!-- Player list will be rendered here -->
       </div>
 
-      <div id="lobby-wait-section" class="lobby-action-section">
-          <h2 class="host-header">Waiting for Players...</h2>
-          
-          <p class="host-instructions">
-            Share this code with your players:
-            <span id="display-lobby-code" class="code-display large-code">ABCD</span>
-          </p>
-          
-          <div id="player-list" class="player-list">
-              <!-- Player list will be rendered here -->
-          </div>
+      <p id="ready-status-text" class="ready-status-text">0/0 players ready.</p>
 
-          <p id="ready-status-text" class="ready-status-text">0/0 players ready.</p>
-          
-          <button id="start-game-button" class="host-button enter-button" disabled>
-            <i class="fa-solid fa-circle-play"></i>
-            <span>Start Game</span>
-          </button>
-          
-          <a href="/dashboard.html" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i> Go Back to Lobby Hub
-          </a>
-      </div>
+      <button id="start-game-button" class="host-button enter-button" disabled>
+        <i class="fa-solid fa-circle-play"></i>
+        <span>Start Game</span>
+      </button>
+
+      <a href="/dashboard.html" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i> Go Back to Lobby Hub
+      </a>
+    </div>
+  </div>
+  <div class="user-section">
+    <img src="" id="avatar" class="avatar-image" />
+    <div id="name" class="username host-name">Host: </div>
   </div>
 
+  <div id="game-editor-section" class="lobby-action-section" style="margin-bottom: 30px; text-align: left;">
+    <h3 style="margin-bottom: 10px;">Game Content</h3>
+    <p id="loaded-game-status">No custom game loaded. <span style="font-style: italic;">(Will use default if you
+        start)</span></p>
+    <a href="/editor" class="host-button enter-button" style="margin-top: 10px;">
+      <i class="fa-solid fa-pen-to-square"></i> Create/Edit Game
+    </a>
+  </div>
+
+  <div id="lobby-wait-section" class="lobby-action-section">
+  </div>
+
+  <script>
+    // NEW JS SNIPPET TO ADD TO host.html (inside the existing <script> block at the end)
+    document.addEventListener('DOMContentLoaded', () => {
+      // This is a minimal script to check the localStorage and update the UI
+      const GAME_DATA_STORAGE_KEY = 'christmasQuizGameData';
+      const loadedGameStatus = document.getElementById('loaded-game-status');
+      const storedData = localStorage.getItem(GAME_DATA_STORAGE_KEY);
+
+      if (storedData) {
+        try {
+          const gameData = JSON.parse(storedData);
+          const roundCount = gameData.length;
+          const questionCount = gameData.reduce((acc, round) => acc + round.questions.length, 0);
+
+          loadedGameStatus.innerHTML = `
+                    <i class="fa-solid fa-check-circle" style="color: green;"></i> 
+                    **Custom Game Loaded:** ${roundCount} Rounds, ${questionCount} Questions.
+                `;
+        } catch (e) {
+          loadedGameStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: red;"></i> Saved data corrupt. Please re-edit.';
+        }
+      }
+
+      // This flag is needed by auth.js to handle host logic
+      window.IS_HOST_PAGE = true;
+    });
+  </script>
   <script>
     // Flag used by auth.js to trigger the lobby creation logic on load
     window.IS_HOST_PAGE = true;
@@ -53,4 +97,5 @@
   <script src="/auth.js" defer></script>
   <script src="/snow.js" defer></script>
 </body>
+
 </html>

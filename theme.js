@@ -1,54 +1,81 @@
-// theme.js
+// theme.js - Handles theme persistence and switching
 
-document.addEventListener('DOMContentLoaded', () => {
+const THEME_STORAGE_KEY = 'gameshow_theme';
+const DEFAULT_THEME = 'warm'; // Default theme if nothing is stored
+
+/**
+ * Applies the given theme class to the document body and saves it to localStorage.
+ * @param {string} themeName - 'warm' or 'cold'
+ */
+function applyTheme(themeName) {
     const body = document.body;
-    const settingsPanel = document.getElementById('settings-panel');
-    const settingsToggleBtn = document.getElementById('settings-toggle-btn');
-    const warmBtn = document.getElementById('theme-warm-btn');
-    const coldBtn = document.getElementById('theme-cold-btn');
-    const logoImage = document.getElementById('app-logo'); 
+    
+    // Clear existing theme classes
+    body.classList.remove('theme-warm', 'theme-cold');
 
-    // Load theme from localStorage or default to warm
-    let currentTheme = localStorage.getItem('appTheme') || 'warm';
-
-    /**
-     * Applies the selected theme and updates the logo image source.
-     * @param {string} theme - 'warm' or 'cold'
-     */
-    function applyTheme(theme) {
-        currentTheme = theme;
-        localStorage.setItem('appTheme', theme);
-
-        // 1. Update body class for CSS variables
-        if (theme === 'cold') {
-            body.classList.add('theme-cold');
-            warmBtn.classList.remove('active');
-            coldBtn.classList.add('active');
-        } else {
-            body.classList.remove('theme-cold');
-            warmBtn.classList.add('active');
-            coldBtn.classList.remove('active');
-        }
-        
-        // 2. Update the logo source based on the theme
-        if (logoImage) {
-            // NOTE: Assumes logos are named logo-warm.svg and logo-cold.svg
-            logoImage.src = theme === 'cold' ? '/logo-cold.svg' : '/logo-warm.svg';
-            logoImage.alt = theme === 'cold' ? 'Cold Theme Logo' : 'Warm Theme Logo';
-        }
+    // Add the new theme class
+    if (themeName === 'cold') {
+        body.classList.add('theme-cold');
+    } else {
+        // If themeName is 'warm' or null/default
+        body.classList.add('theme-warm');
     }
 
-    // Initialize the theme on load
-    applyTheme(currentTheme);
+    // Save preference
+    localStorage.setItem(THEME_STORAGE_KEY, themeName);
 
-    // Event listeners for theme buttons
-    if (warmBtn) warmBtn.addEventListener('click', () => applyTheme('warm'));
-    if (coldBtn) coldBtn.addEventListener('click', () => applyTheme('cold'));
+    // Update the button visual state (if the settings panel is open)
+    updateThemeButtons(themeName);
+}
 
-    // Event listener for settings panel toggle
-    if (settingsToggleBtn) {
-        settingsToggleBtn.addEventListener('click', () => {
-            if (settingsPanel) settingsPanel.classList.toggle('open');
+/**
+ * Initializes the theme on page load.
+ */
+function initializeTheme() {
+    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY) || DEFAULT_THEME;
+    applyTheme(storedTheme);
+}
+
+/**
+ * Updates the 'active' state on the theme selection buttons.
+ * @param {string} currentTheme - 'warm' or 'cold'
+ */
+function updateThemeButtons(currentTheme) {
+    const warmBtn = document.getElementById('theme-warm-btn');
+    const coldBtn = document.getElementById('theme-cold-btn');
+
+    if (warmBtn) {
+        warmBtn.classList.toggle('active', currentTheme === 'warm');
+    }
+    if (coldBtn) {
+        coldBtn.classList.toggle('active', currentTheme === 'cold');
+    }
+}
+
+// --- Settings Panel Logic ---
+
+window.addEventListener('load', () => {
+    initializeTheme();
+
+    const settingsBtn = document.getElementById('settings-toggle-btn');
+    const settingsPanel = document.getElementById('settings-panel');
+    const warmBtn = document.getElementById('theme-warm-btn');
+    const coldBtn = document.getElementById('theme-cold-btn');
+
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.classList.toggle('open');
+            // Ensure button status is correct when opening the panel
+            const currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || DEFAULT_THEME;
+            updateThemeButtons(currentTheme);
         });
+    }
+
+    if (warmBtn) {
+        warmBtn.addEventListener('click', () => applyTheme('warm'));
+    }
+    
+    if (coldBtn) {
+        coldBtn.addEventListener('click', () => applyTheme('cold'));
     }
 });
